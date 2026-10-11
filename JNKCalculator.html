@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Naresh Kumar Simple Calculator</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Arial, sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #0f172a, #312e81, #6d28d9);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 25px 15px;
+            color: #ffffff;
+        }
+
+        /* Project Heading */
+        .project-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .project-header h1 {
+            font-size: clamp(25px, 5vw, 38px);
+            font-weight: 800;
+            letter-spacing: 0.5px;
+            background: linear-gradient(90deg, #ffffff, #a5f3fc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+        }
+
+        .project-header p {
+            color: #cbd5e1;
+            font-size: 15px;
+        }
+
+        /* Calculator Card */
+        .calculator {
+            width: 100%;
+            max-width: 420px;
+            padding: 35px;
+            background: rgba(255, 255, 255, 0.10);
+            border: 1px solid rgba(255, 255, 255, 0.20);
+            border-radius: 24px;
+            backdrop-filter: blur(18px);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.30);
+        }
+
+        .calculator h2 {
+            text-align: center;
+            font-size: 24px;
+            margin-bottom: 8px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #cbd5e1;
+            font-size: 14px;
+            margin-bottom: 30px;
+        }
+
+        /* Input Fields */
+        .input-group {
+            margin-bottom: 22px;
+        }
+
+        .input-group label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 9px;
+            color: #e2e8f0;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.20);
+            border-radius: 12px;
+            outline: none;
+            background: rgba(15, 23, 42, 0.55);
+            color: #ffffff;
+            font-size: 16px;
+            transition: 0.3s;
+        }
+
+        .input-group input::placeholder {
+            color: #94a3b8;
+        }
+
+        .input-group input:focus {
+            border-color: #67e8f9;
+            box-shadow: 0 0 0 3px rgba(103, 232, 249, 0.15);
+        }
+
+        /* Add Button */
+        .add-button {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 12px;
+            background: linear-gradient(90deg, #06b6d4, #6366f1);
+            color: #ffffff;
+            font-size: 17px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 8px 20px rgba(6, 182, 212, 0.20);
+        }
+
+        .add-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 25px rgba(6, 182, 212, 0.35);
+        }
+
+        .add-button:active {
+            transform: scale(0.98);
+        }
+
+        /* Result Area */
+        .result-box {
+            margin-top: 25px;
+            padding: 20px 15px;
+            min-height: 85px;
+            border-radius: 14px;
+            text-align: center;
+            background: rgba(15, 23, 42, 0.50);
+            border: 1px solid rgba(255, 255, 255, 0.10);
+        }
+
+        .result-label {
+            display: block;
+            color: #a5f3fc;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 8px;
+        }
+
+        #result {
+            font-size: 22px;
+            font-weight: 700;
+            overflow-wrap: anywhere;
+        }
+
+        /* Footer */
+        footer {
+            margin-top: 28px;
+            color: #cbd5e1;
+            font-size: 13px;
+            text-align: center;
+        }
+
+        footer span {
+            color: #a5f3fc;
+            font-weight: 600;
+        }
+
+        @media (max-width: 480px) {
+            .calculator {
+                padding: 25px 20px;
+            }
+
+            .project-header h1 {
+                font-size: 27px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <header class="project-header">
+        <h1>Naresh Kumar Simple Calculator</h1>
+        <p>A simple project with a modern look ✨</p>
+    </header>
+
+    <main class="calculator">
+        <h2>🧮 Calculator</h2>
+        <p class="subtitle">Enter two numbers to get their sum</p>
+
+        <div class="input-group">
+            <label for="num1">First Number</label>
+            <input
+                type="number"
+                id="num1"
+                placeholder="Enter first number"
+                step="any"
+            >
+        </div>
+
+        <div class="input-group">
+            <label for="num2">Second Number</label>
+            <input
+                type="number"
+                id="num2"
+                placeholder="Enter second number"
+                step="any"
+            >
+        </div>
+
+        <button class="add-button" onclick="addNumbers()">
+            + Add Numbers
+        </button>
+
+        <div class="result-box" aria-live="polite">
+            <span class="result-label">Your Result</span>
+            <h3 id="result">Result will appear here</h3>
+        </div>
+    </main>
+
+    <footer>
+        Designed & Developed by <span>Naresh Kumar</span> © 2026
+    </footer>
+
+    <script>
+        function addNumbers() {
+            const firstValue = document.getElementById("num1").value;
+            const secondValue = document.getElementById("num2").value;
+            const result = document.getElementById("result");
+
+            if (firstValue.trim() === "" || secondValue.trim() === "") {
+                result.innerText = "Please enter both numbers";
+                return;
+            }
+
+            const num1 = Number(firstValue);
+            const num2 = Number(secondValue);
+
+            if (!Number.isFinite(num1) || !Number.isFinite(num2)) {
+                result.innerText = "Please enter valid numbers";
+                return;
+            }
+
+            const sum = num1 + num2;
+            result.innerText = "Sum = " + sum;
+        }
+    </script>
+
+</body>
+</html>
