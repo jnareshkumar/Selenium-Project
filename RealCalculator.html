@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>J Naresh Kumar - Calculator</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #141e30, #243b55);
+        }
+
+        .calculator {
+            width: 350px;
+            max-width: 100%;
+            padding: 25px;
+            border-radius: 24px;
+            background: #1e293b;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.45);
+        }
+
+        .heading {
+            text-align: center;
+            color: #ffffff;
+            margin-bottom: 20px;
+        }
+
+        .heading h2 {
+            font-size: 22px;
+            margin-bottom: 6px;
+        }
+
+        .heading p {
+            color: #94a3b8;
+            font-size: 12px;
+        }
+
+        .display {
+            width: 100%;
+            min-height: 110px;
+            padding: 18px 14px;
+            margin-bottom: 20px;
+            border-radius: 14px;
+            background: #0f172a;
+            color: white;
+            text-align: right;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            overflow: hidden;
+        }
+
+        #expression {
+            min-height: 22px;
+            color: #94a3b8;
+            font-size: 16px;
+            overflow-wrap: anywhere;
+        }
+
+        #result {
+            font-size: 34px;
+            font-weight: bold;
+            margin-top: 8px;
+            overflow-wrap: anywhere;
+        }
+
+        .buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+        }
+
+        button {
+            height: 58px;
+            border: none;
+            border-radius: 14px;
+            background: #334155;
+            color: white;
+            font-size: 20px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.15s, transform 0.1s;
+            touch-action: manipulation;
+        }
+
+        button:hover {
+            background: #475569;
+        }
+
+        button:active {
+            transform: scale(0.94);
+        }
+
+        .utility {
+            background: #64748b;
+        }
+
+        .utility:hover {
+            background: #8292a8;
+        }
+
+        .operator {
+            background: #7c3aed;
+        }
+
+        .operator:hover {
+            background: #8b5cf6;
+        }
+
+        .equals {
+            background: #06b6d4;
+            color: #082f49;
+        }
+
+        .equals:hover {
+            background: #22d3ee;
+        }
+
+        .zero {
+            grid-column: span 2;
+        }
+
+        .footer {
+            color: #94a3b8;
+            font-size: 11px;
+            text-align: center;
+            margin-top: 18px;
+        }
+
+        @media (max-width: 380px) {
+            .calculator {
+                padding: 16px;
+            }
+
+            button {
+                height: 52px;
+            }
+
+            #result {
+                font-size: 28px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="calculator">
+
+    <div class="heading">
+        <h2>Naresh Kumar Calculator</h2>
+        <p>Simple • Smart • Interactive</p>
+    </div>
+
+    <div class="display" aria-live="polite">
+        <div id="expression">Ready</div>
+        <div id="result">0</div>
+    </div>
+
+    <div class="buttons">
+        <button class="utility" onclick="clearAll()" aria-label="Clear all">AC</button>
+        <button class="utility" onclick="deleteLast()" aria-label="Delete last digit">DEL</button>
+        <button class="utility" onclick="percentage()">%</button>
+        <button class="operator" onclick="chooseOperator('/')" aria-label="Divide">÷</button>
+
+        <button onclick="inputDigit('7')">7</button>
+        <button onclick="inputDigit('8')">8</button>
+        <button onclick="inputDigit('9')">9</button>
+        <button class="operator" onclick="chooseOperator('*')" aria-label="Multiply">×</button>
+
+        <button onclick="inputDigit('4')">4</button>
+        <button onclick="inputDigit('5')">5</button>
+        <button onclick="inputDigit('6')">6</button>
+        <button class="operator" onclick="chooseOperator('-')" aria-label="Subtract">−</button>
+
+        <button onclick="inputDigit('1')">1</button>
+        <button onclick="inputDigit('2')">2</button>
+        <button onclick="inputDigit('3')">3</button>
+        <button class="operator" onclick="chooseOperator('+')" aria-label="Add">+</button>
+
+        <button class="utility" onclick="toggleSign()">±</button>
+        <button class="zero" onclick="inputDigit('0')">0</button>
+        <button onclick="inputDecimal()">.</button>
+        <button class="equals" onclick="calculate()" aria-label="Equals">=</button>
+    </div>
+
+    <div class="footer">
+        Keyboard supported: 0–9, +, -, *, /, Enter, Backspace, Escape
+    </div>
+
+</div>
+
+<script>
+    let currentInput = '0';
+    let previousInput = null;
+    let operator = null;
+    let waitingForOperand = false;
+    let expressionText = '';
+    let justCalculated = false;
+
+    const resultDisplay = document.getElementById('result');
+    const expressionDisplay = document.getElementById('expression');
+
+    function updateDisplay() {
+        resultDisplay.textContent = currentInput;
+        expressionDisplay.textContent = expressionText || 'Ready';
+    }
+
+    function formatNumber(number) {
+        if (!Number.isFinite(number)) {
+            return 'Error';
+        }
+
+        if (Object.is(number, -0)) {
+            number = 0;
+        }
+
+        // Avoid long floating-point results such as 0.30000000000000004.
+        return Number(number.toPrecision(12)).toString();
+    }
+
+    function inputDigit(digit) {
+        if (currentInput === 'Error') {
+            clearAll();
+        }
+
+        if (waitingForOperand || justCalculated) {
+            currentInput = digit;
+            waitingForOperand = false;
+            justCalculated = false;
+        } else if (currentInput === '0') {
+            currentInput = digit;
+        } else if (currentInput.replace('-', '').length < 15) {
+            currentInput += digit;
+        }
+
+        updateDisplay();
+    }
+
+    function inputDecimal() {
+        if (currentInput === 'Error') {
+            clearAll();
+        }
+
+        if (waitingForOperand || justCalculated) {
+            currentInput = '0.';
+            waitingForOperand = false;
+            justCalculated = false;
+        } else if (!currentInput.includes('.')) {
+            currentInput += '.';
+        }
+
+        updateDisplay();
+    }
+
+    function chooseOperator(nextOperator) {
+        if (currentInput === 'Error') {
+            return;
+        }
+
+        const inputValue = Number(currentInput);
+
+        if (operator && !waitingForOperand) {
+            const result = performCalculation(
+                Number(previousInput),
+                inputValue,
+                operator
+            );
+
+            if (result === null) {
+                showError();
+                return;
+            }
+
+            currentInput = formatNumber(result);
+        } else if (justCalculated) {
+            // Continue calculations from the displayed result.
+        }
+
+        previousInput = currentInput;
+        operator = nextOperator;
+        waitingForOperand = true;
+        justCalculated = false;
+
+        expressionText = currentInput + ' ' + operatorSymbol(nextOperator);
+        updateDisplay();
+    }
+
+    function performCalculation(first, second, selectedOperator) {
+        switch (selectedOperator) {
+            case '+':
+                return first + second;
+            case '-':
+                return first - second;
+            case '*':
+                return first * second;
+            case '/':
+                if (second === 0) {
+                    return null;
+                }
+                return first / second;
+            default:
+                return second;
+        }
+    }
+
+    function calculate() {
+        if (!operator || previousInput === null || waitingForOperand) {
+            return;
+        }
+
+        const first = Number(previousInput);
+        const second = Number(currentInput);
+        const selectedOperator = operator;
+
+        const result = performCalculation(
+            first,
+            second,
+            selectedOperator
+        );
+
+        expressionText =
+            formatNumber(first) + ' ' +
+            operatorSymbol(selectedOperator) + ' ' +
+            formatNumber(second) + ' =';
+
+        if (result === null || !Number.isFinite(result)) {
+            showError();
+            return;
+        }
+
+        currentInput = formatNumber(result);
+        previousInput = null;
+        operator = null;
+        waitingForOperand = false;
+        justCalculated = true;
+
+        updateDisplay();
+    }
+
+    function operatorSymbol(op) {
+        const symbols = {
+            '+': '+',
+            '-': '−',
+            '*': '×',
+            '/': '÷'
+        };
+
+        return symbols[op] || op;
+    }
+
+    function clearAll() {
+        currentInput = '0';
+        previousInput = null;
+        operator = null;
+        waitingForOperand = false;
+        expressionText = '';
+        justCalculated = false;
+        updateDisplay();
+    }
+
+    function deleteLast() {
+        if (currentInput === 'Error') {
+            clearAll();
+            return;
+        }
+
+        if (waitingForOperand || justCalculated) {
+            return;
+        }
+
+        if (currentInput.length > 1) {
+            currentInput = currentInput.slice(0, -1);
+
+            if (currentInput === '-') {
+                currentInput = '0';
+            }
+        } else {
+            currentInput = '0';
+        }
+
+        updateDisplay();
+    }
+
+    function toggleSign() {
+        if (currentInput === 'Error' || Number(currentInput) === 0) {
+            return;
+        }
+
+        currentInput = currentInput.startsWith('-')
+            ? currentInput.slice(1)
+            : '-' + currentInput;
+
+        updateDisplay();
+    }
+
+    function percentage() {
+        if (currentInput === 'Error') {
+            return;
+        }
+
+        currentInput = formatNumber(Number(currentInput) / 100);
+        updateDisplay();
+    }
+
+    function showError() {
+        currentInput = 'Error';
+        previousInput = null;
+        operator = null;
+        waitingForOperand = false;
+        justCalculated = true;
+        expressionText = 'Cannot divide by zero';
+        updateDisplay();
+    }
+
+    // Keyboard support
+    document.addEventListener('keydown', function(event) {
+        const key = event.key;
+
+        if (/^[0-9]$/.test(key)) {
+            inputDigit(key);
+        } else if (key === '.') {
+            inputDecimal();
+        } else if (['+', '-', '*', '/'].includes(key)) {
+            chooseOperator(key);
+        } else if (key === 'Enter' || key === '=') {
+            event.preventDefault();
+            calculate();
+        } else if (key === 'Backspace') {
+            deleteLast();
+        } else if (key === 'Escape' || key === 'Delete') {
+            clearAll();
+        } else if (key === '%') {
+            percentage();
+        }
+    });
+
+    updateDisplay();
+</script>
+
+</body>
+</html>
